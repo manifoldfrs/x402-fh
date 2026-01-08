@@ -5,7 +5,7 @@ import { Network, PaymentRequired } from "../types";
 import { findByNetworkAndScheme, findSchemesByNetwork } from "../utils";
 
 /**
- * Client Hook Context Interfaces
+ * Client Hook Context Interfaces - payment lifecycle contexts
  */
 
 export interface PaymentCreationContext {
