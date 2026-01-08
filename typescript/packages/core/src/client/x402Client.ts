@@ -98,6 +98,11 @@ export interface x402ClientConfig {
    * If not provided, uses the default selector (first available option)
    */
   paymentRequirementsSelector?: SelectPaymentRequirements;
+
+  /**
+   * Enable debug logging for payment operations
+   */
+  debug?: boolean;
 }
 
 /**
