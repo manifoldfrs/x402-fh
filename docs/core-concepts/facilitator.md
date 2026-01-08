@@ -40,6 +40,10 @@ While it is possible to implement verification and settlement locally, using a f
 
 2. PayAI [hosts a facilitator](https://facilitator.payai.network) on Solana, Base, Polygon, and more. More info & docs at https://docs.payai.network/x402.
 
+3. Nevermined [hosts a facilitator](https://api.live.nevermined.app/api/v1/rest/docs) for AI agent payment verification and settlement on Base networks. Supports ERC-20 and ERC-1155 assets.
+
+4. xEcho [hosts a facilitator](https://facilitator.xechoai.xyz) on Base with on-chain settlement callbacks, enabling pay-to-earn and outcome-based payment scenarios.
+
 
 ### Interaction Flow
 
