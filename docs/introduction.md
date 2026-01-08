@@ -37,6 +37,8 @@ x402 enables a range of use cases, including:
 * [Paywalls](https://x.com/MurrLincoln/status/1935406976881803601) for digital content
 * Microservices and tooling monetized via microtransactions
 * Proxy services that aggregate and resell API capabilities
+* Client-side integrations for AI platforms like ChatGPT and Claude (e.g., [Oops!402](https://oops402.com))
+* On-chain attestation services (e.g., [Trusta.AI](https://app.trustalabs.ai/attest))
 
 ### How Does It Work?
 
