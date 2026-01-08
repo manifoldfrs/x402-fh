@@ -64,3 +64,5 @@ Ready to build? Start here:
 * [Quickstart for Buyers](/getting-started/quickstart-for-buyers)
 * [Explore Core Concepts](/core-concepts/http-402)
 * [Join our community on Discord](https://discord.gg/invite/cdp)
+
+<!-- TC4: Test that docs-only changes don't trigger the workflow -->
