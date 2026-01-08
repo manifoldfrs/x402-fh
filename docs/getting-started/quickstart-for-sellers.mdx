@@ -425,7 +425,8 @@ For mainnet, use the CDP facilitator:
   <Tab title="Node.js">
     ```typescript
     const facilitatorClient = new HTTPFacilitatorClient({
-      url: "https://api.cdp.coinbase.com/platform/v2/x402"
+      url: "https://api.cdp.coinbase.com/platform/v2/x402",
+      timeout: 30000, // Optional: request timeout in ms (default: 30000)
     });
     ```
   </Tab>
