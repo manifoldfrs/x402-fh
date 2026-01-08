@@ -27,6 +27,11 @@ func (c *ExactEvmScheme) Scheme() string {
 	return evm.SchemeExact
 }
 
+// GetSignerAddress returns the address of the signer used by this scheme
+func (c *ExactEvmScheme) GetSignerAddress() string {
+	return c.signer.Address()
+}
+
 // CreatePaymentPayload creates a V2 payment payload for the exact scheme
 func (c *ExactEvmScheme) CreatePaymentPayload(
 	ctx context.Context,
