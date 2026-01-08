@@ -32,6 +32,16 @@ Using a facilitator provides:
 
 While it is possible to implement verification and settlement locally, using a facilitator accelerates adoption and ensures correct protocol behavior.
 
+### Facilitator Configuration
+
+When using the HTTP facilitator client, you can configure:
+
+* **URL:** The facilitator endpoint (defaults to `https://x402.org/facilitator`)
+* **Timeout:** Request timeout in milliseconds (defaults to 30000ms / 30 seconds)
+* **Authentication:** Optional custom authentication headers for verify, settle, and supported endpoints
+
+All facilitator requests (verify, settle, getSupported) will be aborted if they exceed the configured timeout duration. This prevents requests from hanging indefinitely and ensures predictable behavior.
+
 ### Live Facilitators
 
 1. Currently, CDP hosts a facilitator live on Base mainnet. For more information about getting started, see the [CDP Docs](https://docs.cdp.coinbase.com/x402/docs/welcome).
