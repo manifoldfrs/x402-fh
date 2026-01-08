@@ -22,6 +22,15 @@ export interface PaymentCreationFailureContext extends PaymentCreationContext {
 }
 
 /**
+ * Configuration options for payment retries
+ */
+export interface PaymentRetryOptions {
+  maxRetries: number;
+  retryDelayMs: number;
+  backoffMultiplier?: number;
+}
+
+/**
  * Client Hook Type Definitions
  */
 
