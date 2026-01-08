@@ -1,3 +1,4 @@
+// TC3: Test that test file changes are filtered and don't trigger agent
 import { describe, it, expect } from "vitest";
 import {
   ExactSvmScheme,
