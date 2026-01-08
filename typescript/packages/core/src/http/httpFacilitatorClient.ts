@@ -8,6 +8,7 @@ import {
 } from "../types/facilitator";
 
 const DEFAULT_FACILITATOR_URL = "https://x402.org/facilitator";
+const DEFAULT_TIMEOUT_MS = 30000; // 30 seconds
 
 export interface FacilitatorConfig {
   url?: string;
@@ -16,6 +17,14 @@ export interface FacilitatorConfig {
     settle: Record<string, string>;
     supported: Record<string, string>;
   }>;
+  /**
+   * Request timeout in milliseconds.
+   * All facilitator requests (verify, settle, getSupported) will be aborted
+   * if they exceed this duration.
+   *
+   * @default 30000 (30 seconds)
+   */
+  timeout?: number;
 }
 
 /**
@@ -61,6 +70,7 @@ export interface FacilitatorClient {
  */
 export class HTTPFacilitatorClient implements FacilitatorClient {
   readonly url: string;
+  readonly timeout: number;
   private readonly _createAuthHeaders?: FacilitatorConfig["createAuthHeaders"];
 
   /**
@@ -70,6 +80,7 @@ export class HTTPFacilitatorClient implements FacilitatorClient {
    */
   constructor(config?: FacilitatorConfig) {
     this.url = config?.url || DEFAULT_FACILITATOR_URL;
+    this.timeout = config?.timeout ?? DEFAULT_TIMEOUT_MS;
     this._createAuthHeaders = config?.createAuthHeaders;
   }
 
@@ -93,27 +104,40 @@ export class HTTPFacilitatorClient implements FacilitatorClient {
       headers = { ...headers, ...authHeaders.headers };
     }
 
-    const response = await fetch(`${this.url}/verify`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        x402Version: paymentPayload.x402Version,
-        paymentPayload: this.toJsonSafe(paymentPayload),
-        paymentRequirements: this.toJsonSafe(paymentRequirements),
-      }),
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
-    const data = await response.json();
+    try {
+      const response = await fetch(`${this.url}/verify`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          x402Version: paymentPayload.x402Version,
+          paymentPayload: this.toJsonSafe(paymentPayload),
+          paymentRequirements: this.toJsonSafe(paymentRequirements),
+        }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
 
-    if (typeof data === "object" && data !== null && "isValid" in data) {
-      const verifyResponse = data as VerifyResponse;
-      if (!response.ok) {
-        throw new VerifyError(response.status, verifyResponse);
+      const data = await response.json();
+
+      if (typeof data === "object" && data !== null && "isValid" in data) {
+        const verifyResponse = data as VerifyResponse;
+        if (!response.ok) {
+          throw new VerifyError(response.status, verifyResponse);
+        }
+        return verifyResponse;
       }
-      return verifyResponse;
-    }
 
-    throw new Error(`Facilitator verify failed (${response.status}): ${JSON.stringify(data)}`);
+      throw new Error(`Facilitator verify failed (${response.status}): ${JSON.stringify(data)}`);
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error(`Facilitator verify request timed out after ${this.timeout}ms`);
+      }
+      throw error;
+    }
   }
 
   /**
@@ -136,27 +160,40 @@ export class HTTPFacilitatorClient implements FacilitatorClient {
       headers = { ...headers, ...authHeaders.headers };
     }
 
-    const response = await fetch(`${this.url}/settle`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        x402Version: paymentPayload.x402Version,
-        paymentPayload: this.toJsonSafe(paymentPayload),
-        paymentRequirements: this.toJsonSafe(paymentRequirements),
-      }),
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
-    const data = await response.json();
+    try {
+      const response = await fetch(`${this.url}/settle`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          x402Version: paymentPayload.x402Version,
+          paymentPayload: this.toJsonSafe(paymentPayload),
+          paymentRequirements: this.toJsonSafe(paymentRequirements),
+        }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
 
-    if (typeof data === "object" && data !== null && "success" in data) {
-      const settleResponse = data as SettleResponse;
-      if (!response.ok) {
-        throw new SettleError(response.status, settleResponse);
+      const data = await response.json();
+
+      if (typeof data === "object" && data !== null && "success" in data) {
+        const settleResponse = data as SettleResponse;
+        if (!response.ok) {
+          throw new SettleError(response.status, settleResponse);
+        }
+        return settleResponse;
       }
-      return settleResponse;
-    }
 
-    throw new Error(`Facilitator settle failed (${response.status}): ${JSON.stringify(data)}`);
+      throw new Error(`Facilitator settle failed (${response.status}): ${JSON.stringify(data)}`);
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error(`Facilitator settle request timed out after ${this.timeout}ms`);
+      }
+      throw error;
+    }
   }
 
   /**
@@ -174,17 +211,30 @@ export class HTTPFacilitatorClient implements FacilitatorClient {
       headers = { ...headers, ...authHeaders.headers };
     }
 
-    const response = await fetch(`${this.url}/supported`, {
-      method: "GET",
-      headers,
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
-    if (!response.ok) {
-      const errorText = await response.text().catch(() => response.statusText);
-      throw new Error(`Facilitator getSupported failed (${response.status}): ${errorText}`);
+    try {
+      const response = await fetch(`${this.url}/supported`, {
+        method: "GET",
+        headers,
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => response.statusText);
+        throw new Error(`Facilitator getSupported failed (${response.status}): ${errorText}`);
+      }
+
+      return (await response.json()) as SupportedResponse;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error(`Facilitator getSupported request timed out after ${this.timeout}ms`);
+      }
+      throw error;
     }
-
-    return (await response.json()) as SupportedResponse;
   }
 
   /**
