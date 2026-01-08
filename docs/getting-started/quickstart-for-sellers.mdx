@@ -150,7 +150,8 @@ Integrate the payment middleware into your application. You will need to provide
     const payTo = "0xYourAddress";
 
     const facilitatorClient = new HTTPFacilitatorClient({
-      url: "https://x402.org/facilitator"
+      url: "https://x402.org/facilitator",
+      timeout: 30000, // Optional: request timeout in ms (default: 30000)
     });
 
     const server = new x402ResourceServer(facilitatorClient);
