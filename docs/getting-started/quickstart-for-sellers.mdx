@@ -95,7 +95,8 @@ Integrate the payment middleware into your application. You will need to provide
 
     // Create facilitator client (testnet)
     const facilitatorClient = new HTTPFacilitatorClient({
-      url: "https://x402.org/facilitator"
+      url: "https://x402.org/facilitator",
+      timeout: 30000, // Optional: request timeout in ms (default: 30000)
     });
 
     // Create resource server and register EVM scheme
