@@ -1,3 +1,4 @@
+// TC1: Test normal merge - verify Compare API detects SDK changes
 export type {
   VerifyRequest,
   VerifyResponse,
