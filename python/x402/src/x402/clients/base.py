@@ -68,6 +68,7 @@ class x402Client:
         account: Account,
         max_value: Optional[int] = None,
         payment_requirements_selector: Optional[PaymentSelectorCallable] = None,
+        debug: bool = False,
     ):
         """Initialize the x402 client.
 
@@ -75,9 +76,11 @@ class x402Client:
             account: eth_account.Account instance for signing payments
             max_value: Optional maximum allowed payment amount in base units
             payment_requirements_selector: Optional custom selector for payment requirements
+            debug: Enable debug logging for payment operations
         """
         self.account = account
         self.max_value = max_value
+        self.debug = debug
         self._payment_requirements_selector = (
             payment_requirements_selector or self.default_payment_requirements_selector
         )
